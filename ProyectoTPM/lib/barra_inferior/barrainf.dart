@@ -1,0 +1,250 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:proyectotmp/src/EmpresaViews/ListarHotel.dart';
+import 'package:proyectotmp/src/EmpresaViews/ListarPaquete.dart';
+import 'package:proyectotmp/src/EmpresaViews/ListarReservaciones.dart';
+import 'package:proyectotmp/src/EmpresaViews/ListarUsuarios.dart';
+import 'package:proyectotmp/src/descubrir.dart';
+import 'package:proyectotmp/src/favoritos.dart';
+import 'package:proyectotmp/src/home.dart';
+import 'package:proyectotmp/src/reservas.dart';
+import 'package:proyectotmp/src/perfil.dart';
+import 'package:proyectotmp/src/LogIn.dart';
+import 'package:proyectotmp/src/sesion.dart';
+
+import '../src/EmpresaViews/ListarRestaurante.dart';
+import '../src/EmpresaViews/ListarTour.dart';
+import '../src/EmpresaViews/ListarViaje.dart';
+import 'package:flutter_session/flutter_session.dart';
+
+class BarraInferior extends StatefulWidget{
+
+  @override
+  State<StatefulWidget> createState(){
+    return BarraInferiorMenu();
+  }
+}
+
+var tipo = "";
+bool isLogin = false;
+var user = "";
+var idUser = 0;
+var buscar = TextEditingController();
+
+var desc = 0;
+class BarraInferiorMenu extends State<BarraInferior>{
+  var sF = sesionFunctions();
+  var session = FlutterSession();
+
+  int indexTap = 0;
+  int indexPage = 0;
+  bool colorChange = false;
+  //aqui checar interfaces por si se les ofrece
+  final List<Widget> widgetsChildren = [
+    Home(),
+    Descubrir(),
+    Reservas(),
+    Perfil(),
+    Favoritos(),
+    ListarViajes(),
+    ListarHoteles(),
+    ListarRestaurantes(),
+    ListarTours(),
+    ListarPaquetes(),
+    ListarReservaciones(),
+    ListarUsuarios(),
+    LogIn(),
+  ];
+
+  void onTapTapped (int index,bool color){
+    setState(() {
+      indexPage  = index;
+      indexTap = 0;
+      colorChange = color;
+    });
+  }
+
+  void updateUser() async{
+    tipo = await session.get("tipo");
+    isLogin = await session.get("isLogin");
+    user = (await session.get("user")).toString();
+    idUser = await session.get("idUser");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Future.delayed(Duration(seconds: 1), () {
+      updateUser();
+      setState(() {
+        tipo;
+        isLogin;
+        user;
+        idUser;
+      });
+    });
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      drawer: Drawer(
+        child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                const DrawerHeader(
+                  child: Center(
+                    child: Text(
+                      '',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 25),
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    image: const DecorationImage(
+                    image: AssetImage ('assets/MORELIATURISMO.png'),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                ),
+
+
+                if(isLogin) favoritosBoton(),
+                if(tipo == "Empresa") panelEmpresa() as Column,
+                if(tipo == "Administrador") panelAdministrador() as Column,
+
+                Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(left: 20),
+                  child: const Text(
+                    "General",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                logIn_Out(),
+              ],
+          ),
+        ),
+      ),
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.red),
+        title: Container(
+
+        ),
+        backgroundColor: Colors.black,
+      ),
+      body: colorChange ? widgetsChildren[indexPage] : widgetsChildren[indexTap],
+      bottomNavigationBar: BottomNavigationBar(
+          onTap: (index) => {
+              if(index == 1) buscar = TextEditingController.fromValue(TextEditingValue.empty),
+              desc = 0,
+              setState(() {
+                indexTap = index;
+                colorChange = false;
+              })
+            },
+          currentIndex: indexTap,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: colorChange ? Colors.black54 : Colors.red,
+          iconSize: 25.0,
+          selectedFontSize: 14.0,
+          unselectedFontSize: 12.0,
+          items: const [
+            BottomNavigationBarItem(
+              label: 'HOME',
+              icon: Icon(Icons.home),
+            ),
+            BottomNavigationBarItem(
+              label: 'BUSCAR',
+              icon: Icon(Icons.search),
+            ),
+            BottomNavigationBarItem(
+              label: 'VIAJES',
+              icon: Icon(Icons.rocket_launch),
+            ),BottomNavigationBarItem(
+              label: 'USUARIO',
+              icon: Icon(Icons.account_circle_outlined),
+            ),
+          ]
+      ),
+    );
+  }
+
+  ListTile logIn_Out(){
+    if(isLogin){
+      return ListTile(
+        leading: Icon(Icons.exit_to_app),
+        title: Text('Cerrar Sesion'),
+        onTap: () => {
+          sF.closeSession(context),
+        },
+      );
+    }else{
+      return ListTile(
+          leading: Icon(Icons.login),
+          title: Text('Log In'),
+          onTap: () => {
+            onTapTapped(3,true),
+            Navigator.of(context).pop(),
+          }
+      );
+    }
+  }
+
+  ListTile favoritosBoton(){
+    return ListTile(
+
+    );
+  }
+
+  Column panelEmpresa(){
+    return Column(children: <Widget>[
+      Container(
+        alignment: Alignment.centerLeft,
+        margin: const EdgeInsets.only(left: 20),
+        child: const Text(
+          "AGREGA UN HOTEL",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      ListTile(
+      leading: Icon(Icons.hotel),
+      title: const Text('Hotel'),
+      onTap: () => {
+        onTapTapped(6,true),
+        Navigator.of(context).pop()
+        },
+      ),
+    ],);
+  }
+
+  panelAdministrador(){
+    return Column(children: <Widget>[
+      Container(
+        alignment: Alignment.centerLeft,
+        margin: const EdgeInsets.only(left: 20),
+        child: const Text(
+          "Administrador",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      ListTile(
+        leading: Icon(Icons.account_circle),
+        title: const Text('Usuarios'),
+        onTap: () => {
+          onTapTapped(11,true),
+          Navigator.of(context).pop()
+        },
+      ),
+    ],);
+  }
+
+}
