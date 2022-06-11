@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:proyectotmp/src/Editar_Hotel.dart';
 import 'package:proyectotmp/src/EmpresaViews/AgregarHotel.dart';
 import 'package:proyectotmp/barra_inferior/barrainf.dart' as barra;
 
@@ -143,7 +144,7 @@ class _ListarHoteles extends State<ListarHoteles> {
                     ),
                     IconButton(
                       alignment: Alignment.centerLeft,
-                      onPressed: (){},
+                      onPressed: (){EditarHotel();},
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.grey,
@@ -172,6 +173,8 @@ class _ListarHoteles extends State<ListarHoteles> {
   borrarHotel(index){
 
   }
+
+
 
   InfoHotel(index){
     Navigator.of(context).push(
@@ -652,6 +655,24 @@ class _ListarHoteles extends State<ListarHoteles> {
                     iconTheme: const IconThemeData(color: Colors.black)
                   ),
                     body:AgregarHotel(),
+              );
+            }
+        )
+    );
+  }
+  EditarHotel(){
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder:(context)
+            {
+              return Scaffold(
+                appBar: AppBar(
+                    title: const Text('Editar Tour', style: TextStyle(color: Colors.black),),
+                    backgroundColor: Colors.white,
+                    //centerTitle: true,
+                    iconTheme: const IconThemeData(color: Colors.black)
+                ),
+                body:Editar_Hotel(),
               );
             }
         )

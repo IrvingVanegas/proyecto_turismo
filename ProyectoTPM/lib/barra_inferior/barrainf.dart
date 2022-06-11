@@ -220,6 +220,38 @@ class BarraInferiorMenu extends State<BarraInferior>{
         Navigator.of(context).pop()
         },
       ),
+      ListTile(
+        leading: Icon(Icons.fastfood),
+        title: const Text('Restaurante'),
+        onTap: () => {
+          onTapTapped(8,true),
+          Navigator.of(context).pop()
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.airplanemode_on_sharp),
+        title: const Text('Viaje'),
+        onTap: () => {
+          onTapTapped(7,true),
+          Navigator.of(context).pop()
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.backpack),
+        title: const Text('Paquete'),
+        onTap: () => {
+          onTapTapped(10,true),
+          Navigator.of(context).pop()
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.check),
+        title: const Text('Reservaciones'),
+        onTap: () => {
+          onTapTapped(11,true),
+          Navigator.of(context).pop()
+        },
+      ),
     ],);
   }
 

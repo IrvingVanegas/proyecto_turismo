@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:proyectotmp/src/Editar_Restaurante.dart';
 import 'AgregarRestaurante.dart';
 import 'package:proyectotmp/barra_inferior/barrainf.dart' as barra;
 
@@ -72,7 +73,7 @@ class _ListarRestaurantes extends State<ListarRestaurantes> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _onChangeRegistro,
-        backgroundColor: Colors.pinkAccent,
+        backgroundColor: Colors.red,
         child: const Icon(Icons.add),
       ),
     );
@@ -126,7 +127,7 @@ class _ListarRestaurantes extends State<ListarRestaurantes> {
                     ),
                     IconButton(
                       alignment: Alignment.centerLeft,
-                      onPressed: (){},
+                      onPressed: (){EditarRestaurante();},
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.grey,
@@ -166,6 +167,24 @@ class _ListarRestaurantes extends State<ListarRestaurantes> {
                     iconTheme: const IconThemeData(color: Colors.black)
                 ),
                 body:AgregarRestaurante(),
+              );
+            }
+        )
+    );
+  }
+  EditarRestaurante(){
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder:(context)
+            {
+              return Scaffold(
+                appBar: AppBar(
+                    title: const Text('Editar Restaurante', style: TextStyle(color: Colors.black),),
+                    backgroundColor: Colors.white,
+                    //centerTitle: true,
+                    iconTheme: const IconThemeData(color: Colors.black)
+                ),
+                body:Editar_Restaurante(),
               );
             }
         )
