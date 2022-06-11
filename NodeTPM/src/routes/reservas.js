@@ -135,4 +135,9 @@ router.post('/reservas/email', (req, res) => {
     Organizador.mandarEmail(res, sql);
 });
 
+router.get('/reservas/Listar', (req, res) => { 
+    let sql = "SELECT * FROM reserva_servicio";
+    Organizador.ListarSQL(res, sql);
+});
+
 module.exports = router;

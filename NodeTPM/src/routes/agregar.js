@@ -85,40 +85,20 @@ router.post('/Agregar/Paquete', (req, res, next) => {
 });
 
 router.post('/Agregar/Reserva/', (req, res, next) => {
-    const {TipoServicio} = req.body;
     const {fechaEntrada} = req.body;
     const {fechaSalida} = req.body;
-    const {costoNeto} = req.body;
     const {costoTotal} = req.body;
     const {CantPersonas} = req.body;
-    const {idUser} = req.body;
-    const {idDestino} = req.body;
+    const {confirmado} = req.body;
+    const {idUsuario} = req.body;
 
     let sql;
-    sql = "INSERT INTO reserva_servicio(TipoServicio, FechaEntrada, FechaSalida, FormaPago, CostoTotal, CantPersonas,confirmado,idTurista,idUsuario) VALUES ('"+TipoServicio+"','"+fechaEntrada+"','"+fechaSalida+"','Efectivo',"+costoTotal+","+CantPersonas+",'0','1',"+idUser+")";
+    sql = "INSERT INTO reserva_servicio(FechaEntrada, FechaSalida, CostoTotal, CantPersonas, confirmado, idUsuario) VALUES ('"+fechaEntrada+"','"+fechaSalida+"',"+costoTotal+","+CantPersonas+","+confirmado+","+idUsuario+")";
     Reservas.Agregar(res,sql);
-    
-    sql = "SELECT idReserva FROM reserva_servicio ORDER BY idReserva DESC LIMIT 1";
-    Reservas.temp(res,sql,TipoServicio,idDestino);
 });
 
-router.post('/Agregar/Prueba', (req, res, next) => {
-    const {TipoServicio} = req.body;
-    const {fechaEntrada} = req.body;
-    const {fechaSalida} = req.body;
-    const {costoNeto} = req.body;
-    const {costoTotal} = req.body;
-    const {CantPersonas} = req.body;
-    const {idUser} = req.body;
-    const {idDestino} = req.body;
+//INSERT INTO `reserva_servicio` (`idReserva`, `FechaEntrada`, `FechaSalida`, `CostoTotal`, `CantPersonas`, `confirmado`, `idUsuario`) VALUES ('1', '2022-06-11', '2022-06-13', '1472', '1', '1', '7');
 
-    let sql;
-    sql = "INSERT INTO reserva_servicio(TipoServicio, FechaEntrada, FechaSalida, FormaPago, CostoTotal, CantPersonas,confirmado,idUsuario) VALUES ('"+TipoServicio+"','"+fechaEntrada+"','"+fechaSalida+"','Efectivo',"+costoTotal+","+CantPersonas+",'0',"+idUser+")";
-    //Reservas.Agregar(res,sql);
-    
-    sql = "SELECT idReserva FROM reserva_servicio ORDER BY idReserva DESC LIMIT 1";
-    Reservas.temp(res,sql,TipoServicio,idDestino);
-});
 
 
 module.exports = router;

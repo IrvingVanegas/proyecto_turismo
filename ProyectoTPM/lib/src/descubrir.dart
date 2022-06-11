@@ -6,15 +6,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
-class Descubrir extends StatefulWidget{
-
+class Descubrir extends StatefulWidget {
   @override
   State<StatefulWidget> createState(){
     return _Descubrir();
   }
 }
 
-class _Descubrir extends State<Descubrir>{
+class _Descubrir extends State<Descubrir> {
 
   late List ServiciosData = [];
   late List ServiciosData2 = [];
@@ -27,37 +26,33 @@ class _Descubrir extends State<Descubrir>{
   final _fechaSalidaInputTextController = TextEditingController();
   final _costoNetoInputTextController = TextEditingController();
   final _costoTotalInputTextController = TextEditingController();
-  var tipoService = '';
-  Object _personasInputTextController = "";
-  var idDestino = 0;
-  // String CostoNeto = "0";
-  // String CostoTotal = "30";
+  var _idEmpresa=0;
+  final _personasInputTextController = TextEditingController();
 
-  Object PersonselectedValue = "1";
-
-  void _sendControllers(tipo){
-  _updateControllers(tipo);
+  void _sendControllers(idUsuario){
+    _updateControllers(idUsuario);
   }
 
-  void _updateControllers(tipo){
+  void _updateControllers(idUsuario){
     var controllers = [
+      _idEmpresa=idUsuario,
       _fechaEntradaInputTextController.value.text,
       _fechaSalidaInputTextController.value.text,
       _costoNetoInputTextController.value.text,
       _costoTotalInputTextController.value.text,
-      _personasInputTextController.toString(),
-      tipoService = tipo,
+      _personasInputTextController.value.text,
     ];
     agregarReserva(controllers);
   }
 
   void agregarReserva(controllers) async {
-    var FechaEntrada = controllers[0];
-    var FechaSalida = controllers[1];
-    var costoNeto = controllers[2].toString().substring(1);
-    var costoTotal = controllers[3].toString().substring(1);
-    var Personas = controllers[4];
-    var tipoS = controllers[5].toString().substring(2);
+    var idUsuario = controllers[0];
+    var FechaEntrada = controllers[1];
+    var FechaSalida = controllers[2];
+    var costoNeto = controllers[3].toString().substring(1);
+    var costoTotal = controllers[4].toString().substring(1);
+    var Personas = controllers[5];
+    var confirmado = 1.toString();
 
     //var urlReserva = Uri.parse('http://10.0.2.2:4000/Agregar/Reserva');
 
@@ -65,52 +60,24 @@ class _Descubrir extends State<Descubrir>{
 
     late List reservas = [];
     var response;
-    var idUsuario = barra.idUser;
-
-    var idTurista = '';
 
     if(_verifyData(FechaEntrada,FechaSalida,costoNeto,costoTotal,context)){
       try{
 
         if(idUsuario != ''){
-          response = await http.post(urlReserva, body: {'TipoServicio': '$tipoS','fechaEntrada': '$FechaEntrada', 'fechaSalida': '$FechaSalida',
-            'costoNeto': '$costoNeto','costoTotal': '$costoTotal','CantPersonas': '$Personas','idUser': '$idUsuario','idDestino': '$idDestino'
+          response = await http.post(urlReserva, body: {
+            'fechaEntrada': '$FechaEntrada',
+            'fechaSalida': '$FechaSalida',
+            'costoTotal': '$costoTotal',
+            'CantPersonas': '$Personas',
+            'confirmado': '$confirmado',
+            'idUsuario': '$idUsuario'
           });
 
           if(json.decode(response.body)['row'].toString() != 'null'){
             reservas = List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
           }
 
-          var url2 = Uri.parse('http://localhost:4000/Agregar/Prueba');
-          response = await http.post(url2, body: {'TipoServicio': '$tipoS','fechaEntrada': '$FechaEntrada', 'fechaSalida': '$FechaSalida',
-            'costoNeto': '$costoNeto','costoTotal': '$costoTotal','CantPersonas': '$Personas','idUser': '$idUsuario','idDestino': '$idDestino'
-          });
-
-          if(json.decode(response.body)['row'].toString() != 'null'){
-            reservas = List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
-          }
-
-          if(!_personasInputTextController.toString().isEmpty){
-            Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder:(context)
-                    {
-                      return barra.BarraInferior();
-                      //return listaT.ListarTours();
-                    }
-                )
-            );
-          }
-          _alert('Reserva agregada',context);
-        }
-        else{
-          response = await http.post(urlReserva, body: {'fechaEntrada': '$FechaEntrada', 'fechaSalida': '$FechaSalida',
-            'costoNEto': '$costoNeto','costoTotal': '$costoTotal','idTutista': '$idTurista'
-          });
-
-          if(json.decode(response.body)['row'].toString() != 'null'){
-            reservas = List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
-          }
           if(!_personasInputTextController.toString().isEmpty){
             Navigator.of(context).push(
                 MaterialPageRoute(
@@ -167,7 +134,6 @@ class _Descubrir extends State<Descubrir>{
 
   int activeIndex= 0;
 
-  //obtenemos los datos de la api
   getReservas() async {
     var desc = barra.desc;
     var buscar = barra.buscar.text;
@@ -216,7 +182,7 @@ class _Descubrir extends State<Descubrir>{
       ServiciosData2.addAll(ServiciosP);
       setState(() {
         _costoNetoInputTextController.text = "\$0.00";
-        _costoTotalInputTextController.text = "\$30.00";
+        _costoTotalInputTextController.text = "\$0.00";
       });
     }
     if(desc == 1){
@@ -240,7 +206,6 @@ class _Descubrir extends State<Descubrir>{
 
   }
 
-  //constructor tara inicializar el getFavoritos
   @override
   void initState() {
     super.initState();
@@ -280,373 +245,328 @@ class _Descubrir extends State<Descubrir>{
                   color: Colors.white,
 
                   onPressed: (){
-                      if(ServiciosData[i]["idHotel"] != null){_onChangeReserva(i,"idHotel"); idDestino = ServiciosData[i]["idHotel"];}
-                      if(ServiciosData[i]["idViaje"] != null) {_onChangeReserva(i,"idViaje"); idDestino = ServiciosData[i]["idViaje"];}
-                      if(ServiciosData[i]["idRestaurante"] != null) {_onChangeReserva(i,"idRestaurante"); idDestino = ServiciosData[i]["idRestaurante"];}
-                      if(ServiciosData[i]["idTour"] != null) {_onChangeReserva(i,"idTour"); idDestino = ServiciosData[i]["idTour"];}
-                      if(ServiciosData[i]["idPaquete"] != null) {_onChangeReserva(i,"idPaquete"); idDestino = ServiciosData[i]["idPaquete"];}
-                    },
+                    if(ServiciosData[i]["idUsuario"] != null){
+                      _idEmpresa = ServiciosData[i]["idUsuario"];
+                      _onChangeReserva(i,_idEmpresa);
+                    }
+                    if(ServiciosData[i]["idUsuario"] != null) {
+                      _idEmpresa = ServiciosData[i]["idUsuario"];
+                      _onChangeReserva(i,_idEmpresa);
+                    }
+                    if(ServiciosData[i]["idUsuario"] != null) {
+                      _idEmpresa = ServiciosData[i]["idUsuario"];
+                      _onChangeReserva(i,_idEmpresa);
+                    }
+                    if(ServiciosData[i]["idUsuario"] != null) {
+                      _idEmpresa = ServiciosData[i]["idUsuario"];
+                      _onChangeReserva(i,_idEmpresa);
+                    }
+                    if(ServiciosData[i]["idUsuario"] != null) {
+                      _idEmpresa = ServiciosData[i]["idUsuario"];
+                      _onChangeReserva(i,_idEmpresa);
+                    }
+                  },
                   // child: Card(
-                child: Container(
-                  height: 290,
-                  decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20)),
-                  margin: EdgeInsets.all(5),
-                  padding: EdgeInsets.all(5),
-                  child: Stack(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: Image.network(
-                              '${ServiciosData[i]["Imagen"].toString()}',
-                               fit: BoxFit.fill,
-                          ),
-                        ),
-                         Text(
-                          '${ServiciosData[i]["Nombre"].toString()}',
-                          style: const TextStyle(
-                          fontSize: 16,
-                          //fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                         Row(
-                             children: <Widget>[
-                               Container(
-                                 margin: const EdgeInsets.only(
-                                     bottom: 5, top: 4),
-                                 child: const Icon(
-                                   Icons.star,
-                                   color: Colors.red,
-                                   size: 10,
-                                 ),
-                               ),
-                               Container(
-                                   margin: const EdgeInsets.only(
-                                       left: 5,
-                                       bottom:5,
-                                       top: 4),
-                                   child: Text(
-                                     "${ServiciosData[i]["Calificacion"].toString()}",
-                                     style: const TextStyle(
-                                       fontSize: 10,
-                                     ),
-                                   )
-                               ),
-                             ]
-                          ),
-                          Row(
-                            children:  [
-                              Text(
-                                'Desde ${ServiciosData[i]["Costo"].toString()} MXM p/p',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
+                  child: Container(
+                    height: 290,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20)),
+                    margin: EdgeInsets.all(5),
+                    padding: EdgeInsets.all(5),
+                    child: Stack(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: Image.network(
+                                '${ServiciosData[i]["Imagen"].toString()}',
+                                fit: BoxFit.fill,
                               ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
+                            ),
+                            Text(
+                              '${ServiciosData[i]["Nombre"].toString()}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                //fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
+                                children: <Widget>[
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                        bottom: 5, top: 4),
+                                    child: const Icon(
+                                      Icons.star,
+                                      color: Colors.red,
+                                      size: 10,
+                                    ),
+                                  ),
+                                  Container(
+                                      margin: const EdgeInsets.only(
+                                          left: 5,
+                                          bottom:5,
+                                          top: 4),
+                                      child: Text(
+                                        "${ServiciosData[i]["Calificacion"].toString()}",
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                        ),
+                                      )
+                                  ),
+                                ]
+                            ),
+                            Row(
+                              children:  [
+                                Text(
+                                  'Desde ${ServiciosData[i]["Costo"].toString()} MXM p/p',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-               ),
               );
-          },
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1.0,
-            crossAxisSpacing: 0.0,
-            mainAxisSpacing: 5,
-            mainAxisExtent: 264,
-          ),
+            },
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.0,
+              crossAxisSpacing: 0.0,
+              mainAxisSpacing: 5,
+              mainAxisExtent: 264,
+            ),
           ),
         ),
       ],
     );
   }
 
-  late List user = [];
-  var nombre = "";
-  var apellidoP = "";
-  var id = 0;
-  var TipoReserva = "";
 
-  void getUserInfo(index, tipo) async{
-    var id = 0;
-    var columna = "";
-    var tabla = "";
 
-    if(tipo == "idHotel"){
-      id = ServiciosData[index]["idHotel"];
-      columna = "idHotel";
-      tabla = TipoReserva = "hotel" ;
-    }
-    if(tipo == "idViaje"){
-      id = ServiciosData[index]["idViaje"];
-      columna = "idViaje";
-      tabla = "viajes";
-    }
-    if(tipo == "idRestaurante"){
-      id = ServiciosData[index]["idRestaurante"];
-      columna = "idRestaurante";
-      tabla = "restaurantes";
-    }
-    if(tipo == "idTour"){
-      id = ServiciosData[index]["idTour"];
-      columna = "idTour";
-      tabla = "tour";
-    }
-    if(tipo == "idPaquete"){
-      id = ServiciosData[index]["idPaquete"];
-      columna = "idPaquete";
-      tabla = "paquetes";
-    }
-
-    var response = await http.post(Uri.parse("http://localhost:4000/Usuarios/Nombre/"), body: {'id': '$id', 'columna': '$columna', 'tabla': '$tabla'});
-    if(json.decode(response.body)['row'].toString() != 'null'){
-      user = List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
-    }
-
-    setState(() {
-      nombre = user.first["Nombre"];
-      apellidoP = user.first["ApellidoPaterno"];
-    });
-  }
-
-  void _onChangeReserva(index,tipo) {
-    getUserInfo(index,tipo);
-    id = index;
+  void _onChangeReserva(index,idUsuario) {
+    var id=index;
     var calificacion = ServiciosData[index]["Calificacion"];
     // print(ServiciosData[index].toString());
 
     Future.delayed(Duration(milliseconds: 100), () {
-    Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (context) {
-              final CarouselController _controller = CarouselController();
-              final List<String>  images = [
-                ServiciosData[index]["Imagen"].toString(),
-                ServiciosData[index]["Imagen"].toString(),
-                ServiciosData[index]["Imagen"].toString(),
-                ServiciosData[index]["Imagen"].toString(),
-                ServiciosData[index]["Imagen"].toString(),
-                ServiciosData[index]["Imagen"].toString(),
-                ServiciosData[index]["Imagen"].toString(),
-              ];
+      Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) {
+                final CarouselController _controller = CarouselController();
+                final List<String>  images = [
+                  ServiciosData[index]["Imagen"].toString(),
+                  ServiciosData[index]["Imagen"].toString(),
+                  ServiciosData[index]["Imagen"].toString(),
+                  ServiciosData[index]["Imagen"].toString(),
+                  ServiciosData[index]["Imagen"].toString(),
+                  ServiciosData[index]["Imagen"].toString(),
+                  ServiciosData[index]["Imagen"].toString(),
+                ];
 
 
 
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text('Reservar', style: TextStyle(color: Colors.black),),
-                  backgroundColor: Colors.white,
+                return Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Reservar', style: TextStyle(color: Colors.black),),
+                    backgroundColor: Colors.white,
                     //centerTitle: true,
-                  iconTheme: const IconThemeData(color: Colors.black),
-                  leading: IconButton( //menu icon button at start left of appbar
-                    onPressed: (){
-                      _fechaEntradaInputTextController.text = "";
-                      _fechaSalidaInputTextController.text = "";
-                      _costoNetoInputTextController.text = "\$0.00";
-                      _costoTotalInputTextController.text = "\$0.00";
-                      PersonselectedValue = "1";
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(Icons.arrow_back),
+                    iconTheme: const IconThemeData(color: Colors.black),
+                    leading: IconButton( //menu icon button at start left of appbar
+                      onPressed: (){
+                        _fechaEntradaInputTextController.text = "";
+                        _fechaSalidaInputTextController.text = "";
+                        _personasInputTextController.text = "";
+                        _costoNetoInputTextController.text = "\$0.00";
+                        _costoTotalInputTextController.text = "\$0.00";
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(Icons.arrow_back),
+                    ),
                   ),
-                ),
-                body: Center(
-                    child: ListView(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CarouselSlider.builder(
-                          options: CarouselOptions(
-                            height: 390,
-                            viewportFraction: 1,
-                            autoPlay: true,
-                            onPageChanged: (index, reason) =>
-                                setState(()=> activeIndex = index),
+                  body: Center(
+                      child: ListView(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CarouselSlider.builder(
+                            options: CarouselOptions(
+                              height: 390,
+                              viewportFraction: 1,
+                              autoPlay: true,
+                              onPageChanged: (index, reason) =>
+                                  setState(()=> activeIndex = index),
+                            ),
+                            itemCount: images.length,
+                            itemBuilder: (context, index, realindex) {
+                              final image = images[index];
+                              return buildImage(image, index);
+                            },
                           ),
-                          itemCount: images.length,
-                          itemBuilder: (context, index, realindex) {
-                            final image = images[index];
-                            return buildImage(image, index);
-                          },
-                        ),
 
-                        const SizedBox(height: 10,),
+                          const SizedBox(height: 10,),
 
-                        SizedBox(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  margin: const EdgeInsets.only(left: 16, right: 16),
-                                  child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .start,
-                                      children: <Widget>[
-                                        Container(
-                                          child: Text(
-                                            ServiciosData[index]["Nombre"],
-                                            style: const TextStyle(
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.bold,
+                          SizedBox(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 16, right: 16),
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .start,
+                                        children: <Widget>[
+                                          Container(
+                                            child: Text(
+                                              ServiciosData[index]["Nombre"],
+                                              style: const TextStyle(
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
 
-                                        Row(
-                                            children: <Widget>[
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    bottom: 5),
-                                                child: const Icon(
-                                                  Icons.star,
-                                                  color: Colors.red,
-                                                  size: 15,
-                                                ),
-                                              ),
-                                              Container(
+                                          Row(
+                                              children: <Widget>[
+                                                Container(
                                                   margin: const EdgeInsets.only(
-                                                      left: 5,
-                                                      bottom: 5,
-                                                      top: 2),
-                                                  child: Text(
-                                                    "$calificacion",
-                                                    style: const TextStyle(
-                                                      fontSize: 10,
-                                                    ),
-                                                  )
-                                              ),
-                                            ]
-                                        ),
-
-                                        Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Container(
-                                                  margin: const EdgeInsets.only(
-                                                      bottom: 2),
-                                                  child: Text(
-                                                    "Experiencia ofrecida \n"
-                                                        "por $nombre $apellidoP",
-                                                    textAlign: TextAlign.start,
-                                                    style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.w700,
-                                                    ),
-                                                  )
-                                              ),
-                                              Container(
-                                                height: 60,
-                                                width: 60,
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: NetworkImage(
-                                                      "https://th.bing.com/th/id/OIP.DqQp2MTPz9G8kcWeHoAj8gHaIv?pid=ImgDet&rs=1",
-                                                    ),
-                                                    alignment: Alignment.topRight,
-                                                    fit: BoxFit.fill,
+                                                      bottom: 5),
+                                                  child: const Icon(
+                                                    Icons.star,
+                                                    color: Colors.red,
+                                                    size: 15,
                                                   ),
                                                 ),
-                                              ),
-                                            ]
-                                        ),
-
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            bottom: 10,
+                                                Container(
+                                                    margin: const EdgeInsets.only(
+                                                        left: 5,
+                                                        bottom: 5,
+                                                        top: 2),
+                                                    child: Text(
+                                                      "$calificacion",
+                                                      style: const TextStyle(
+                                                        fontSize: 10,
+                                                      ),
+                                                    )
+                                                ),
+                                              ]
                                           ),
-                                          child: Text(
-                                            "Costo: ${ServiciosData[index]["Costo"].toString()}",
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ),
 
-                                        Container(
-                                          child: const Divider(
-                                            color: Colors.black54,
-                                            thickness: 1,
-                                          ),
-                                        ),
-
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              bottom: 5,
-                                              top: 5),
-                                          child: const Text(
-                                            "¿Qué harás?",
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ),
-
-                                        Container(
-                                          child: Text(
-                                            ServiciosData[index]["Descripcion"].toString(),
-                                            textAlign: TextAlign.justify,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ),
-
-
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: <Widget>[
-                                            Container(
-                                              width: 300,
-                                              margin: const EdgeInsets.only(top: 20.0, bottom: 30.0),
-                                              child: RaisedButton(
-                                                  color: Colors.red,
-                                                  textColor: Colors.white,
-                                                  child: const Text(
-                                                    "Reservar",
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
+                                          Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Container(
+                                                  height: 60,
+                                                  width: 60,
+                                                  decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(
+                                                        "https://th.bing.com/th/id/OIP.DqQp2MTPz9G8kcWeHoAj8gHaIv?pid=ImgDet&rs=1",
+                                                      ),
+                                                      alignment: Alignment.topRight,
+                                                      fit: BoxFit.fill,
                                                     ),
                                                   ),
-                                                  onPressed: () { _onPressReserva(id,tipo);}),
+                                                ),
+                                              ]
+                                          ),
+
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                              bottom: 10,
                                             ),
-                                          ],
-                                        ),
-                                      ]
+                                            child: Text(
+                                              "Costo: ${ServiciosData[index]["Costo"].toString()}",
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+
+                                          Container(
+                                            child: const Divider(
+                                              color: Colors.black54,
+                                              thickness: 1,
+                                            ),
+                                          ),
+
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 5,
+                                                top: 5),
+                                            child: const Text(
+                                              "¿Qué harás?",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+
+                                          Container(
+                                            child: Text(
+                                              ServiciosData[index]["Descripcion"].toString(),
+                                              textAlign: TextAlign.justify,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+
+
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: <Widget>[
+                                              Container(
+                                                width: 300,
+                                                margin: const EdgeInsets.only(top: 20.0, bottom: 30.0),
+                                                child: RaisedButton(
+                                                    color: Colors.red,
+                                                    textColor: Colors.white,
+                                                    child: const Text(
+                                                      "Reservar",
+                                                      style: TextStyle(
+                                                        fontSize: 16.0,
+                                                      ),
+                                                    ),
+                                                    onPressed: () { _onPressReserva(id,idUsuario);}),
+                                              ),
+                                            ],
+                                          ),
+                                        ]
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
-                        ),
-                      ],
-                    )
-                ),
-              );
-            }
-        )
+                                ],
+                              )
+                          ),
+                        ],
+                      )
+                  ),
+                );
+              }
+          )
       );
     });
   }
 
-  void _onPressReserva(index, tipo) {
+  void _onPressReserva(index,idUsuario) {
     Navigator.of(context).push(
       MaterialPageRoute(
-      builder: (context) {
-        return Scaffold(
+        builder: (context) {
+          return Scaffold(
             appBar: AppBar(
-              title: const Text('Confirmar', style: TextStyle(color: Colors.black),),
-              backgroundColor: Colors.white,
-              //centerTitle: true,
-              iconTheme: const IconThemeData(color: Colors.black)
+                title: const Text('Confirmar', style: TextStyle(color: Colors.black),),
+                backgroundColor: Colors.white,
+                //centerTitle: true,
+                iconTheme: const IconThemeData(color: Colors.black)
             ),
-          body: SingleChildScrollView(
+            body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
                   Row(
@@ -796,9 +716,9 @@ class _Descubrir extends State<Descubrir>{
                                   );
 
                                   if(pickedDate != null ){
-                                   // print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
+                                    // print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
                                     String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-                                   // print(formattedDate); //formatted date output using intl package =>  2021-03-16
+                                    // print(formattedDate); //formatted date output using intl package =>  2021-03-16
                                     //you can implement different kind of Date Format here according to your requirement
                                     setState(() {
                                       _fechaSalidaInputTextController.text = formattedDate; //set output date to TextField value.
@@ -825,27 +745,21 @@ class _Descubrir extends State<Descubrir>{
                       ),
                     ),
                   ),
-
                   Container(
                     width: double.infinity,
-                    height: 60,
-                    margin: const EdgeInsets.only(left:12, right: 12, top:10, bottom: 30),
-                      child:DropdownButtonFormField(
-                          decoration: const InputDecoration(
-                              icon: Icon(Icons.person), //icon of text field
-                              labelText: "Cantidad" //label text of field
-                          ),
-                          dropdownColor: const Color.fromRGBO(234, 234, 234, 1.0),
-                          value: PersonselectedValue,
-                          onChanged: (Object? value){
-                            setState(() {
-                              PersonselectedValue = value!;
-                              _personasInputTextController = value;
-                              calcularCosto(index);
-                            });
-                          },
-                          items: PersondropdownItems,
-                      )
+                    height: 40,
+                    margin: const EdgeInsets.only(left:12, right: 12, bottom: 15),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(93, 93, 93, 0.1), borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: TextFormField(
+                      textAlign: TextAlign.center,
+                      controller: _personasInputTextController,
+                      decoration: const InputDecoration(
+                        hintText: '...',
+                        border: InputBorder.none,
+                      ),
+                    ),
                   ),
 
                   const Divider(
@@ -884,7 +798,7 @@ class _Descubrir extends State<Descubrir>{
                           alignment: Alignment.centerRight,
                           margin: const EdgeInsets.only(top: 30),
                           child: TextField(
-                              controller: _costoNetoInputTextController,
+                            controller: _costoNetoInputTextController,
                             textAlign: TextAlign.right,
                             decoration: null,
                             readOnly: true,
@@ -903,7 +817,7 @@ class _Descubrir extends State<Descubrir>{
                         alignment: Alignment.centerLeft,
                         margin: const EdgeInsets.only(top: 10),
                         child: const Text(
-                            "Comision por servicio",
+                          "Comision por servicio",
                           textAlign: TextAlign.left,
                         ),
                       ),
@@ -913,7 +827,7 @@ class _Descubrir extends State<Descubrir>{
                         alignment: Alignment.centerRight,
                         margin: const EdgeInsets.only(top: 10),
                         child: const Text(
-                            "\$20.00",
+                          "\$20.00",
                           textAlign: TextAlign.right,
                         ),
                       ),
@@ -958,7 +872,7 @@ class _Descubrir extends State<Descubrir>{
                         alignment: Alignment.bottomRight,
                         margin: const EdgeInsets.only(top: 10),
                         child: TextField(
-                            controller: _costoTotalInputTextController,
+                          controller: _costoTotalInputTextController,
                           textAlign: TextAlign.right,
                           decoration: null,
                           readOnly: true,
@@ -980,7 +894,7 @@ class _Descubrir extends State<Descubrir>{
                         onPrimary: Colors.white,
                         // side: BorderSide(color: Colors.red, width: 1),
                       ),
-                      onPressed:(){_sendControllers (tipo);} ,
+                      onPressed:(){_sendControllers (idUsuario);} ,
 
                       child: const Text(
                         'Confirmar Reserva',
@@ -1006,7 +920,7 @@ class _Descubrir extends State<Descubrir>{
     //0123456789
 
     if(!_fechaEntradaInputTextController.value.text.isEmpty &&
-       !_fechaSalidaInputTextController.value.text.isEmpty){
+        !_fechaSalidaInputTextController.value.text.isEmpty){
       int mesInicio = int.parse(_fechaEntradaInputTextController.value.text.substring(5,7));
       int mesSalida = int.parse(_fechaSalidaInputTextController.value.text.substring(5,7));
       int diaInicio = int.parse(_fechaEntradaInputTextController.value.text.substring(8));
@@ -1049,4 +963,3 @@ class _Descubrir extends State<Descubrir>{
         ),
       );
 }
-

@@ -3,9 +3,9 @@ const jwt           = require('jsonwebtoken');
 const server_config = require('config');
 
 function Listar(req,res){
-    conexion.query("SELECT * FROM apoyos").
+    conexion.query("SELECT * FROM reserva_servicio").
     then(rows => {
-        const accessToken = jwt.sign({ idHotel: rows[0].idApoyo }, server_config.get('app.JWT_SECRET'), {
+        const accessToken = jwt.sign({ idReserva: rows[0].idApoyo }, server_config.get('app.JWT_SECRET'), {
             expiresIn: "1d"
         });
         res.header("Access-Control-Allow-Origin", "*");
