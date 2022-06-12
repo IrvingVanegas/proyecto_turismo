@@ -48,11 +48,11 @@ router.post('/Usuarios/Listar/', (req, res, next) => {
 });
 
 router.post('/Usuarios/Borrar/', (req, res, next) => {
-    const {id} = req.body;
-    const {row} = req.body;
+    const {idUsuario} = req.body;
+    console.log("Hola");
     
-    console.log(req.body);
-    let sql = "DELETE from usuarios where idUsuario = '"+row+"'";
+    let sql = `DELETE from usuarios where idUsuario = ${idUsuario}`;
+    
     Usuarios.Borrar(res,sql);
     //res.json(req.body);
 });

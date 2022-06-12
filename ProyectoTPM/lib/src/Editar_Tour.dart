@@ -186,7 +186,7 @@ class _Editar_Tour extends State<Editar_Tour>{
                         shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(10.0),
                         ),
-                        primary: Colors.pinkAccent,
+                        primary: Colors.red,
                         onPrimary: Colors.white,
                         // side: BorderSide(color: Colors.red, width: 1),
                       ),
