@@ -48,9 +48,12 @@ router.post('/Usuarios/Listar/', (req, res, next) => {
 });
 
 router.post('/Usuarios/Borrar/', (req, res, next) => {
+    const {id} = req.body;
+    const {row} = req.body;
+    
     console.log(req.body);
-    let sql = "SELECT idUsuario,Usuario,Email,TipoUsuario FROM usuarios WHERE TipoUsuario != 'Administrador'";
-    Usuarios.registrar(res,sql);
+    let sql = "DELETE from usuarios where idUsuario = '"+row+"'";
+    Usuarios.Borrar(res,sql);
     //res.json(req.body);
 });
 

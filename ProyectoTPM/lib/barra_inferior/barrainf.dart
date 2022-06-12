@@ -221,16 +221,16 @@ class BarraInferiorMenu extends State<BarraInferior>{
         },
       ),
       ListTile(
-        leading: Icon(Icons.fastfood),
-        title: const Text('Restaurante'),
+        leading: Icon(Icons.airplanemode_on_sharp),
+        title: const Text('Tours'),
         onTap: () => {
           onTapTapped(8,true),
           Navigator.of(context).pop()
         },
       ),
       ListTile(
-        leading: Icon(Icons.airplanemode_on_sharp),
-        title: const Text('Viaje'),
+        leading: Icon(Icons.fastfood),
+        title: const Text('Cocina'),
         onTap: () => {
           onTapTapped(7,true),
           Navigator.of(context).pop()
@@ -238,15 +238,24 @@ class BarraInferiorMenu extends State<BarraInferior>{
       ),
       ListTile(
         leading: Icon(Icons.backpack),
-        title: const Text('Paquete'),
+        title: const Text('Paquetes'),
+        onTap: () => {
+          onTapTapped(9,true),
+          Navigator.of(context).pop()
+        },
+      ),
+      ListTile(
+        leading: Icon(Icons.rocket_launch),
+        title: const Text('Reservas'),
         onTap: () => {
           onTapTapped(10,true),
           Navigator.of(context).pop()
         },
       ),
+
       ListTile(
-        leading: Icon(Icons.check),
-        title: const Text('Reservaciones'),
+        leading: Icon(Icons.account_circle_outlined),
+        title: const Text('Usuarios'),
         onTap: () => {
           onTapTapped(11,true),
           Navigator.of(context).pop()

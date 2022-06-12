@@ -72,7 +72,7 @@ class _ListarViajes extends State<ListarViajes> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _onChangeRegistro,
-        backgroundColor: Colors.pinkAccent,
+        backgroundColor: Colors.red,
         child: const Icon(Icons.add),
       ),
     );

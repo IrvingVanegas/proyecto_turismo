@@ -43,7 +43,7 @@ router.post('/empresa/Paquetes/', (req, res, next) => {
     let sql;
 
     if(tipo == "Administrador") sql = "SELECT * FROM Paquetes";
-    else sql = "SELECT * FROM Paquetes WHERE idUsuario = "+id;
+    else sql = "SELECT * FROM Paquetes WHERE idUsuario = "+id+";";
     Organizador.ListarSQL(res, sql);
 });
 

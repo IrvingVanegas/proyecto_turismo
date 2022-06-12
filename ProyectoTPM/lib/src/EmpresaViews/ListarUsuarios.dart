@@ -17,7 +17,7 @@ class _ListarUsuarios extends State<ListarUsuarios> {
   late List Usuarios = [];
   late List ServiciosH = [];
 
-  getUsuarios() async{
+  getUsuarios() async {
     //Para Celular
     //var url = Uri.parse("http://10.0.2.2:4000/Usuarios/Listar/");
 
@@ -25,8 +25,9 @@ class _ListarUsuarios extends State<ListarUsuarios> {
     var url = Uri.parse("http://localhost:4000/Usuarios/Listar/");
 
     var response = await http.post(url);
-    if(json.decode(response.body)['row'].toString() != 'null'){
-      ServiciosH = List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
+    if (json.decode(response.body)['row'].toString() != 'null') {
+      ServiciosH =
+      List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
     }
 
     setState(() {
@@ -43,14 +44,15 @@ class _ListarUsuarios extends State<ListarUsuarios> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             Container(
-              margin: const EdgeInsets.only(top:25 ,bottom: 10,right: 10, left: 10),
+              margin: const EdgeInsets.only(
+                  top: 25, bottom: 10, right: 10, left: 10),
               alignment: Alignment.bottomLeft,
               child: const Text(
-                "Reservas",
+                "Usuarios",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w600,
@@ -59,7 +61,7 @@ class _ListarUsuarios extends State<ListarUsuarios> {
             ),
             SizedBox(
               width: double.infinity,
-              child: Usuarios.isEmpty ? DataTableNull() :  DataTableWithData(),
+              child: Usuarios.isEmpty ? DataTableNull() : DataTableWithData(),
             ),
           ],
         ),
@@ -72,9 +74,9 @@ class _ListarUsuarios extends State<ListarUsuarios> {
     );
   }
 
-  DataTableNull(){
+  DataTableNull() {
     return Container(
-      margin: const EdgeInsets.only(top:50),
+      margin: const EdgeInsets.only(top: 50),
       alignment: Alignment.center,
       child: const Text(
         "Sin Datos Registrados",
@@ -86,8 +88,8 @@ class _ListarUsuarios extends State<ListarUsuarios> {
     );
   }
 
-  DataTableWithData(){
-    return  DataTable(
+  DataTableWithData() {
+    return DataTable(
 
       columns: const <DataColumn>[
         DataColumn(
@@ -108,46 +110,74 @@ class _ListarUsuarios extends State<ListarUsuarios> {
       ],
       rows: List<DataRow>.generate(
         Usuarios == null ? 0 : Usuarios.length,
-            (int index) => DataRow(
-          cells: <DataCell>[
-            DataCell(Text(Usuarios[index]["idUsuario"].toString())),
-            DataCell(Text(Usuarios[index]["Usuario"].toString())),
-            DataCell(Text(Usuarios[index]["Email"].toString())),
-            DataCell(Text(Usuarios[index]["TipoUsuario"].toString())),
-            DataCell(
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      alignment: Alignment.centerLeft,
-                      onPressed: (){
-                        eliminarUsuario(Usuarios[index]["idUsuario"]);
-                      },
-                      icon: const Icon(
-                        Icons.delete_forever,
-                        color: Colors.red,
-                        size: 25,
-                      ),
-                    ),
-                  ],
-                )
+            (int index) =>
+            DataRow(
+              cells: <DataCell>[
+                DataCell(Text(Usuarios[index]["idUsuario"].toString())),
+                DataCell(Text(Usuarios[index]["Usuario"].toString())),
+                DataCell(Text(Usuarios[index]["Email"].toString())),
+                DataCell(Text(Usuarios[index]["TipoUsuario"].toString())),
+                DataCell(
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          alignment: Alignment.centerLeft,
+                          onPressed: () {
+                            eliminarUsuario(Usuarios[index]["idUsuario"]);
+                          },
+                          icon: const Icon(
+                            Icons.delete_forever,
+                            color: Colors.red,
+                            size: 25,
+                          ),
+                        ),
+                      ],
+                    )
+                ),
+              ],
             ),
-          ],
-        ),
       ),
     );
   }
 
-  eliminarUsuario(id) async{
-    var url = Uri.parse('http://localhost:4000/Usuarios/Borrar/');
-    //var response = await http.post(url);
+  eliminarUsuario(id) async {
+    var idUsuario;
+    var urlUsers = Uri.parse('http://localhost:4000/Usuarios/Borrar/');
 
-   alerta("Usuario eliminado");
+    late List Usuario = [];
+    var response;
+
+    if (_verifyData(barra.idUser, context)) {
+      try {
+        response = await http.post(urlUsers, body: {'idUsuario': '$idUsuario'
+        });
+
+        if (json.decode(response.body)['row'].toString() != 'null') {
+          Usuario =
+          List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
+        }
+      } catch (_) {
+        alerta('No se encuentra usuario', context);
+      }
+    }
   }
 
-  alerta(mensaje){
-    showDialog(context: context, builder: (BuildContext context){
+  bool _verifyData(id, context) {
+    if (id == '') {
+      alerta('Debe de haber usuario', context);
+      return false;
+    } else
+      return true;
+  }
+
+
+  alerta(mensaje, context) {
+    showDialog(context: context, builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(mensaje, style: Theme.of(context).textTheme.headline6),
+        title: Text(mensaje, style: Theme
+            .of(context)
+            .textTheme
+            .headline6),
         actions: <Widget>[
           TextButton(
             child: const Text('Volver'),
