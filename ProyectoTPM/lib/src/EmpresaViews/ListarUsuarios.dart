@@ -141,7 +141,8 @@ class _ListarUsuarios extends State<ListarUsuarios> {
   }
 
   eliminarUsuario(id) async {
-    var idUsuario;
+
+
     var urlUsers = Uri.parse('http://localhost:4000/Usuarios/Borrar/');
 
     late List Usuario = [];
@@ -149,15 +150,16 @@ class _ListarUsuarios extends State<ListarUsuarios> {
 
     if (_verifyData(barra.idUser, context)) {
       try {
-        response = await http.post(urlUsers, body: {'idUsuario': '$idUsuario'
+        response = await http.post(urlUsers, body: {'idUsuario': '$id'
         });
 
-        if (json.decode(response.body)['row'].toString() != 'null') {
+        if (json.decode(response.body)['row'] != 'null') {
           Usuario =
           List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
         }
+        getUsuarios();
       } catch (_) {
-        alerta('No se encuentra usuario', context);
+        alerta('Usuario Eliminado', context);
       }
     }
   }
