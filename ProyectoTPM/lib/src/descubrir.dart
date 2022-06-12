@@ -27,16 +27,18 @@ class _Descubrir extends State<Descubrir> {
   final _fechaSalidaInputTextController = TextEditingController();
   final _costoNetoInputTextController = TextEditingController();
   final _costoTotalInputTextController = TextEditingController();
+  var _nombreServicio = "";
   var _idEmpresa=0;
   final _personasInputTextController = TextEditingController();
 
-  void _sendControllers(idUsuario){
-    _updateControllers(idUsuario);
+  void _sendControllers(idUsuario,nombre){
+    _updateControllers(idUsuario,nombre);
   }
 
-  void _updateControllers(idUsuario){
+  void _updateControllers(idUsuario,nombre){
     var controllers = [
       _idEmpresa=idUsuario,
+      _nombreServicio=nombre,
       _fechaEntradaInputTextController.value.text,
       _fechaSalidaInputTextController.value.text,
       _costoNetoInputTextController.value.text,
@@ -48,11 +50,12 @@ class _Descubrir extends State<Descubrir> {
 
   void agregarReserva(controllers) async {
     var idUsuario = controllers[0];
-    var FechaEntrada = controllers[1];
-    var FechaSalida = controllers[2];
-    var costoNeto = controllers[3].toString().substring(1);
-    var costoTotal = controllers[4].toString().substring(1);
-    var Personas = controllers[5];
+    var servicio = controllers[1];
+    var FechaEntrada = controllers[2];
+    var FechaSalida = controllers[3];
+    var costoNeto = controllers[4].toString().substring(1);
+    var costoTotal = controllers[5].toString().substring(1);
+    var Personas = controllers[6];
     var confirmado = 1.toString();
 
     //var urlReserva = Uri.parse('http://10.0.2.2:4000/Agregar/Reserva');
@@ -67,6 +70,7 @@ class _Descubrir extends State<Descubrir> {
 
         if(idUsuario != ''){
           response = await http.post(urlReserva, body: {
+            'servicio': '$servicio',
             'fechaEntrada': '$FechaEntrada',
             'fechaSalida': '$FechaSalida',
             'costoTotal': '$costoTotal',
@@ -252,24 +256,29 @@ class _Descubrir extends State<Descubrir> {
 
                   onPressed: (){
                     if(ServiciosData[i]["idUsuario"] != null){
+                      _nombreServicio = ServiciosData[i]["Nombre"].toString();
                       _idEmpresa = ServiciosData[i]["idUsuario"];
-                      _onChangeReserva(i,_idEmpresa);
+                      _onChangeReserva(i,_idEmpresa, _nombreServicio);
                     }
                     if(ServiciosData[i]["idUsuario"] != null) {
+                      _nombreServicio = ServiciosData[i]["Nombre"].toString();
                       _idEmpresa = ServiciosData[i]["idUsuario"];
-                      _onChangeReserva(i,_idEmpresa);
+                      _onChangeReserva(i,_idEmpresa, _nombreServicio);
                     }
                     if(ServiciosData[i]["idUsuario"] != null) {
+                      _nombreServicio = ServiciosData[i]["Nombre"].toString();
                       _idEmpresa = ServiciosData[i]["idUsuario"];
-                      _onChangeReserva(i,_idEmpresa);
+                      _onChangeReserva(i,_idEmpresa, _nombreServicio);
                     }
                     if(ServiciosData[i]["idUsuario"] != null) {
+                      _nombreServicio = ServiciosData[i]["Nombre"].toString();
                       _idEmpresa = ServiciosData[i]["idUsuario"];
-                      _onChangeReserva(i,_idEmpresa);
+                      _onChangeReserva(i,_idEmpresa, _nombreServicio);
                     }
                     if(ServiciosData[i]["idUsuario"] != null) {
+                      _nombreServicio = ServiciosData[i]["Nombre"].toString();
                       _idEmpresa = ServiciosData[i]["idUsuario"];
-                      _onChangeReserva(i,_idEmpresa);
+                      _onChangeReserva(i,_idEmpresa, _nombreServicio);
                     }
                   },
                   // child: Card(
@@ -355,7 +364,7 @@ class _Descubrir extends State<Descubrir> {
 
 
 
-  void _onChangeReserva(index,idUsuario) {
+  void _onChangeReserva(index,idUsuario, nombre) {
     var id=index;
     var calificacion = ServiciosData[index]["Calificacion"];
     // print(ServiciosData[index].toString());
@@ -541,7 +550,7 @@ class _Descubrir extends State<Descubrir> {
                                                         fontSize: 16.0,
                                                       ),
                                                     ),
-                                                    onPressed: () { _onPressReserva(id,idUsuario);}),
+                                                    onPressed: () { _onPressReserva(id,idUsuario,nombre);}),
                                               ),
                                             ],
                                           ),
@@ -561,7 +570,9 @@ class _Descubrir extends State<Descubrir> {
     });
   }
 
-  void _onPressReserva(index,idUsuario) {
+  void _onPressReserva(index,idUsuario,nombre) {
+    var indice = reservaciones.length-1;
+    var folio = reservaciones[indice]["idReserva"]+1;
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -651,7 +662,7 @@ class _Descubrir extends State<Descubrir> {
                     alignment: Alignment.centerLeft,
                     margin: const EdgeInsets.only(left:10, right: 10, top: 20),
                     child: Text(
-                        "Folio: ${reservaciones.length+1}",
+                        "Folio: ${folio.toString()}",
                       style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -946,7 +957,7 @@ class _Descubrir extends State<Descubrir> {
                         onPrimary: Colors.white,
                         // side: BorderSide(color: Colors.red, width: 1),
                       ),
-                      onPressed:(){_sendControllers (idUsuario);} ,
+                      onPressed:(){_sendControllers (idUsuario,nombre);} ,
 
                       child: const Text(
                         'Confirmar Reserva',
