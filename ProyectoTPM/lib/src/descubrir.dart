@@ -22,6 +22,7 @@ class _Descubrir extends State<Descubrir> {
   late List ServiciosR = [];
   late List ServiciosT = [];
   late List ServiciosP = [];
+  late List reservaciones = [];
   final _fechaEntradaInputTextController = TextEditingController();
   final _fechaSalidaInputTextController = TextEditingController();
   final _costoNetoInputTextController = TextEditingController();
@@ -151,12 +152,14 @@ class _Descubrir extends State<Descubrir> {
     var urlR = Uri.parse('http://localhost:4000/servicios/Restaurantes');
     var urlT = Uri.parse('http://localhost:4000/servicios/Tour');
     var urlP = Uri.parse('http://localhost:4000/servicios/Paquetes');
+    var urlRes = Uri.parse('http://localhost:4000/reservas/Listar');
 
     var responseH = await http.get(urlH);
     var responseV = await http.get(urlV);
     var responseR = await http.get(urlR);
     var responseT = await http.get(urlT);
     var responseP = await http.get(urlP);
+    var responseRes = await http.get(urlRes);
 
     if(json.decode(responseH.body)['row'].toString() != 'null'){
       ServiciosH = List<Map<String, dynamic>>.from(json.decode(responseH.body)['row']);
@@ -172,6 +175,9 @@ class _Descubrir extends State<Descubrir> {
     }
     if(json.decode(responseP.body)['row'].toString() != 'null'){
       ServiciosP = List<Map<String, dynamic>>.from(json.decode(responseP.body)['row']);
+    }
+    if(json.decode(responseRes.body)['row'].toString() != 'null'){
+      reservaciones = List<Map<String, dynamic>>.from(json.decode(responseRes.body)['row']);
     }
 
     if(desc == 0){
@@ -556,6 +562,7 @@ class _Descubrir extends State<Descubrir> {
   }
 
   void _onPressReserva(index,idUsuario) {
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
@@ -632,6 +639,19 @@ class _Descubrir extends State<Descubrir> {
                     margin: const EdgeInsets.only(left:10, right: 10, top: 20),
                     child: const Text(
                       "Tu viaje",
+                      style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    margin: const EdgeInsets.only(left:10, right: 10, top: 20),
+                    child: Text(
+                        "Folio: ${reservaciones.length+1}",
                       style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -758,6 +778,38 @@ class _Descubrir extends State<Descubrir> {
                       decoration: const InputDecoration(
                         hintText: '...',
                         border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+
+                  const Divider(
+                    color: Colors.black38,
+                  ),
+
+                  Container(
+                    width: Theme.of(context).textTheme.bodyText1!.fontSize! * 24,
+                    margin: const EdgeInsets.only(left:6, right: 6, top: 50, bottom: 30),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(8.0),
+                        ),
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                        // side: BorderSide(color: Colors.red, width: 1),
+                      ),
+                      onPressed:(){
+                        setState(() {
+                          calcularCosto(index);
+                        });
+                      } ,
+
+                      child: const Text(
+                        'Calcular costo',
+                        style: TextStyle(
+                          color: Colors.white,
+
+                        ),
                       ),
                     ),
                   ),
@@ -925,7 +977,7 @@ class _Descubrir extends State<Descubrir> {
       int mesSalida = int.parse(_fechaSalidaInputTextController.value.text.substring(5,7));
       int diaInicio = int.parse(_fechaEntradaInputTextController.value.text.substring(8));
       int diaSalida = int.parse(_fechaSalidaInputTextController.value.text.substring(8));
-      int personas = _personasInputTextController.toString().isEmpty ? 1 : int.parse(_personasInputTextController.toString());
+      int personas = int.parse(_personasInputTextController.value.text);
       int costo = int.parse(ServiciosData[index]["Costo"].toString());
       print("personas = "+personas.toString());
 
