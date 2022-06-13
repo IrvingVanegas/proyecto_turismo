@@ -13,50 +13,22 @@ class ListarReservaciones extends StatefulWidget{
 
 class _ListarReservaciones extends State<ListarReservaciones> {
   late List ServiciosData = [];
-  late List ServiciosH = [];
-  late List ServiciosV = [];
-  late List ServiciosT = [];
-  late List ServiciosR = [];
+  late List reservaciones = [];
   var idUser = barra.idUser;
 
   //obtenemos los datos de la api
   getReservas() async {
-    var tipo = barra.tipo;
+    var identificador = idUser.toString();
 
-    //para telefono
-    //var urlH = Uri.parse('http://10.0.2.2:4000/reservas/hotelN');
-    //var urlV = Uri.parse('http://10.0.2.2:4000/reservas/viajeN');
-    //var urlT = Uri.parse('http://10.0.2.2:4000/reservas/tourN');
-    //var urlR = Uri.parse('http://10.0.2.2:4000/reservas/restauranteN');
+    var url = Uri.parse('http://localhost:4000/reservas/Empresa/');
+    var response = await http.post(url, body: {'id': '$identificador'});
 
-    // para web
-    var urlH = Uri.parse('http://localhost:4000/reservas/hotelN');
-    var urlV = Uri.parse('http://localhost:4000/reservas/viajeN');
-    var urlT = Uri.parse('http://localhost:4000/reservas/tourN');
-    var urlR = Uri.parse('http://localhost:4000/reservas/restauranteN');
-    var responseH = await http.post(urlH, body: {'id': '$idUser','tipo': '$tipo'});
-    var responseV = await http.post(urlV, body: {'id': '$idUser','tipo': '$tipo'});
-    var responseT = await http.post(urlT, body: {'id': '$idUser','tipo': '$tipo'});
-    var responseR = await http.post(urlR, body: {'id': '$idUser','tipo': '$tipo'});
-
-    if(json.decode(responseH.body)['row'].toString() != 'null'){
-      ServiciosH = List<Map<String, dynamic>>.from(json.decode(responseH.body)['row']);
-    }
-    if(json.decode(responseV.body)['row'].toString() != 'null'){
-      ServiciosV = List<Map<String, dynamic>>.from(json.decode(responseV.body)['row']);
-    }
-    if(json.decode(responseT.body)['row'].toString() != 'null'){
-      ServiciosT = List<Map<String, dynamic>>.from(json.decode(responseT.body)['row']);
-    }
-    if(json.decode(responseR.body)['row'].toString() != 'null'){
-      ServiciosR = List<Map<String, dynamic>>.from(json.decode(responseR.body)['row']);
+    if(json.decode(response.body)['row'].toString() != 'null'){
+      reservaciones = List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
     }
 
     setState(() {
-      ServiciosData.addAll(ServiciosH);
-      ServiciosData.addAll(ServiciosV);
-      ServiciosData.addAll(ServiciosT);
-      ServiciosData.addAll(ServiciosR);
+      ServiciosData.addAll(reservaciones);
     });
   }
 
@@ -129,13 +101,12 @@ class _ListarReservaciones extends State<ListarReservaciones> {
         ServiciosData == null ? 0 : ServiciosData.length,
             (int index) => DataRow(
           cells: <DataCell>[
-            DataCell(Text(ServiciosData[index]["Nombre"].toString())),
+            DataCell(Text(ServiciosData[index]["servicio"].toString())),
             DataCell(Text(ServiciosData[index]["FechaEntrada"].toString())),
             DataCell(Text(ServiciosData[index]["FechaSalida"].toString())),
             DataCell(
                 Row(
                   children: <Widget>[
-                    confirmado(index),
                     IconButton(
                       alignment: Alignment.centerLeft,
                       onPressed: (){
@@ -159,22 +130,15 @@ class _ListarReservaciones extends State<ListarReservaciones> {
     );
   }
 
-  confirmar(index) async{
-    var id = ServiciosData[index]["idReserva"];
-    var url = Uri.parse('http://localhost:4000/reservas/confirmar');
-    var responseH = await http.post(url, body: {'id': '$id'});
-
-    var idU = ServiciosData[index]["idUsuario"];
-    var urlU = Uri.parse('http://localhost:4000/reservas/email');
-    http.post(urlU, body: {'id': '$idU'});
-
-    alerta("Reserva confirmada");
-  }
-
   eliminar(index) async{
     var id = ServiciosData[index]["idReserva"];
-    var url = Uri.parse('http://localhost:4000/reservas/eliminar');
-    var responseH = await http.post(url, body: {'id': '$id'});
+    var url = Uri.parse('http://localhost:4000/reservas/eliminar/');
+    var response = await http.post(url, body: {'id': '$id'});
+    if (json.decode(response.body)['row'] != 'null') {
+      reservaciones =
+      List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
+    }
+    getReservas();
 
     alerta("Reserva eliminada");
   }
@@ -191,34 +155,5 @@ class _ListarReservaciones extends State<ListarReservaciones> {
         ],
       );
     });
-  }
-
-  IconButton confirmado(index){
-    if(ServiciosData[index]["confirmado"] == 0){
-      return IconButton(
-        alignment: Alignment.centerLeft,
-        onPressed: (){
-          confirmar(index);
-          setState(() {
-            ServiciosData[index]["confirmado"] = 1;
-          });
-        },
-        icon: const Icon(
-          Icons.check_circle_outline,
-          color: Colors.grey,
-          size: 25,
-        ),
-      );
-    }else{
-      return IconButton(
-        alignment: Alignment.centerLeft,
-        onPressed: (){alerta("Reserva ya confirmada");},
-        icon: const Icon(
-          Icons.check_circle,
-          color: Colors.grey,
-          size: 25,
-        ),
-      );
-    }
   }
 }

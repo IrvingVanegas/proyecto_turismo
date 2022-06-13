@@ -205,7 +205,7 @@ class BarraInferiorMenu extends State<BarraInferior>{
         alignment: Alignment.centerLeft,
         margin: const EdgeInsets.only(left: 20),
         child: const Text(
-          "AGREGA UN HOTEL",
+          "Gestion",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -255,9 +255,9 @@ class BarraInferiorMenu extends State<BarraInferior>{
 
       ListTile(
         leading: Icon(Icons.account_circle_outlined),
-        title: const Text('Usuarios'),
+        title: const Text('Reservaciones'),
         onTap: () => {
-          onTapTapped(11,true),
+          onTapTapped(10,true),
           Navigator.of(context).pop()
         },
       ),

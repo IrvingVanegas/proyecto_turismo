@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:proyectotmp/barra_inferior/barrainf.dart' as barra;
 
+import 'home.dart';
+
 class Reservas extends StatefulWidget {
 
   @override
@@ -96,7 +98,6 @@ class _Reservas extends State<Reservas> {
   searchFolio (id) async{
 
     var identificador = id.toString();
-    late List reservaciones = [];
 
     var url = Uri.parse('http://localhost:4000/reservas/Folio/');
     var response = await http.post(url, body: {'id': '$identificador'});
@@ -133,6 +134,16 @@ class _Reservas extends State<Reservas> {
                            mainAxisAlignment: MainAxisAlignment.center,
                            crossAxisAlignment: CrossAxisAlignment.start,
                            children: <Widget> [
+                             Container(
+                               child: Text(
+                                 "Folio: ${reservaciones[0]["idReserva"].toString()}",
+                                 style: const TextStyle(
+                                     fontSize: 30,
+                                     fontWeight: FontWeight.bold,
+                                     color: Colors.black54
+                                 ),
+                               ),
+                             ),
                              Container(
                                child: Text(
                                  "Reservacion: ${reservaciones[0]["servicio"].toString()}",
@@ -193,6 +204,20 @@ class _Reservas extends State<Reservas> {
                                  ),
                                ),
                              ),
+                             Container(
+                               width: 300,
+                               margin: const EdgeInsets.only(top: 20.0, bottom: 30.0),
+                               child: RaisedButton(
+                                   color: Colors.red,
+                                   textColor: Colors.white,
+                                   child: const Text(
+                                     "Cancelar",
+                                     style: TextStyle(
+                                       fontSize: 16.0,
+                                     ),
+                                   ),
+                                   onPressed: () { eliminar(identificador);}),
+                             ),
                            ]
                        ),
                      ),
@@ -216,5 +241,32 @@ class _Reservas extends State<Reservas> {
          );
        });
      }
+  }
+
+  eliminar(index) async{
+    late List res = [];
+    var id = index;
+    var url = Uri.parse('http://localhost:4000/reservas/eliminar/');
+    var response = await http.post(url, body: {'id': '$id'});
+    if (json.decode(response.body)['row'] != 'null') {
+      res =
+      List<Map<String, dynamic>>.from(json.decode(response.body)['row']);
+    }
+
+    alerta("Reserva eliminada");
+  }
+
+  alerta(mensaje){
+    showDialog(context: context, builder: (BuildContext context){
+      return AlertDialog(
+        title: Text(mensaje, style: Theme.of(context).textTheme.headline6),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Volver'),
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+          ),
+        ],
+      );
+    });
   }
 }
