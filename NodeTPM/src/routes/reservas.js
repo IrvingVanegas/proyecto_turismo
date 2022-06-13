@@ -111,11 +111,9 @@ router.post('/reservas/eliminar', (req, res) => {
     Organizador.eliminarReserva(res, sql);
 });
 
-router.post('/reservas/Folio', (req, res, next) => {
+router.post('/reservas/Folio/', (req, res, next) => {
     const {id} = req.body;
-    let sql = "SELECT O.*, T.Nombre, T.ApellidoPaterno, T.ApellidoMaterno  FROM "+
-    "reserva_servicio AS R INNER JOIN turista AS T ON R.idTurista = T.idTurista "+ 
-    "INNER JOIN organizador AS O ON O.idReserva = R.idReserva WHERE R.idReserva = " +id;
+    let sql = "SELECT * FROM reserva_servicio Where idReserva = "+id;
     Organizador.Buscarfolio(res, sql, id);
 });
 
